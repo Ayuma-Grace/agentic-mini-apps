@@ -1,13 +1,524 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zap polls</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZapPoll: Fun & Interactive Polls 🎉</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7b2cbf;
+            --secondary: #c77dff;
+            --accent: #ff9e00;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #38b000;
+            --bg: #ffffff;
+            --text: #212529;
+            --card-bg: #ffffff;
+            --input-bg: #f8f9fa;
+            --border: #e9ecef;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --text: #f8f9fa;
+            --card-bg: #1e1e1e;
+            --input-bg: #2d2d2d;
+            --border: #333;
+            --light: #2d2d2d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            margin: 0.5rem auto 0;
+            border-radius: 2px;
+        }
+
+        .poll-form, .poll-results, .active-poll {
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text);
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.2);
+        }
+
+        button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(123, 44, 191, 0.3);
+        }
+
+        .poll-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 12px 15px;
+            background: var(--light);
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .poll-option:hover {
+            transform: translateX(5px);
+            border-color: var(--primary);
+        }
+
+        .result-bar {
+            height: 30px;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+
+        .winner-badge {
+            background: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(20deg);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            opacity: 0;
+            z-index: 100;
+        }
+
+        .emoji-float {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            z-index: 10;
+            animation: floatUp 3s forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .trending-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(to right, #ff6b6b, #ff9e00);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="themeToggle">🌓</button>
+        <div class="trending-badge">🔥 TRENDING</div>
+        <h1>ZapPoll 🎤</h1>
+        
+        <div class="poll-form" id="pollForm">
+            <h2>Create Your Poll</h2>
+            <form id="createPollForm">
+                <div class="form-group">
+                    <label for="pollQuestion">Ask a fun question:</label>
+                    <input type="text" id="pollQuestion" placeholder="Which pizza topping is the best?" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Options (min 2):</label>
+                    <div id="pollOptions">
+                        <input type="text" class="poll-option-input" placeholder="Option 1" required>
+                        <input type="text" class="poll-option-input" placeholder="Option 2" required>
+                    </div>
+                    <button type="button" id="addOptionBtn" class="secondary">+ Add Option</button>
+                </div>
+                
+                <button type="submit" id="createPollBtn">🚀 Launch Poll</button>
+            </form>
+        </div>
+        
+        <div class="poll-results" id="pollResults" style="display: none;">
+            <h2 id="resultsQuestion"></h2>
+            <div id="resultsContainer"></div>
+            <button id="backToCreate">Create Another Poll</button>
+        </div>
+        
+        <div class="active-poll" id="activePoll" style="display: none;">
+            <h2 id="activeQuestion"></h2>
+            <form id="voteForm">
+                <div id="voteOptions"></div>
+                <button type="submit">Vote Now</button>
+            </form>
+            <button id="viewResults">See Live Results</button>
+        </div>
+    </div>
+
+    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+    <audio id="confettiSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const themeToggle = document.getElementById('themeToggle');
+            const createPollForm = document.getElementById('createPollForm');
+            const addOptionBtn = document.getElementById('addOptionBtn');
+            const pollOptions = document.getElementById('pollOptions');
+            const activePoll = document.getElementById('activePoll');
+            const pollResults = document.getElementById('pollResults');
+            
+            // Sound effects
+            const clickSound = document.getElementById('clickSound');
+            const winSound = document.getElementById('winSound');
+            const confettiSound = document.getElementById('confettiSound');
+            
+            // State
+            let currentPoll = null;
+            
+            // Theme toggle
+            themeToggle.addEventListener('click', function() {
+                document.body.setAttribute('data-theme', 
+                    document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+                );
+                playSound(clickSound);
+            });
+            
+            // Play sound helper
+            function playSound(sound) {
+                sound.currentTime = 0;
+                sound.play();
+            }
+            
+            // Add option button
+            addOptionBtn.addEventListener('click', function() {
+                const optionInput = document.createElement('input');
+                optionInput.type = 'text';
+                optionInput.className = 'poll-option-input';
+                optionInput.placeholder = `Option ${pollOptions.children.length + 1}`;
+                optionInput.required = true;
+                pollOptions.appendChild(optionInput);
+                playSound(clickSound);
+            });
+            
+            // Create poll form
+            createPollForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                playSound(clickSound);
+                
+                const question = document.getElementById('pollQuestion').value;
+                const options = Array.from(document.querySelectorAll('.poll-option-input'))
+                    .map(input => input.value.trim())
+                    .filter(value => value !== '');
+                
+                if (options.length < 2) {
+                    alert('Please add at least 2 options!');
+                    return;
+                }
+                
+                currentPoll = {
+                    question,
+                    options: options.map(option => ({
+                        text: option,
+                        votes: 0
+                    })),
+                    voted: false
+                };
+                
+                displayActivePoll();
+                createConfetti(document.getElementById('createPollBtn'), 20);
+                playSound(confettiSound);
+            });
+            
+            // Display active poll
+            function displayActivePoll() {
+                document.getElementById('activeQuestion').textContent = currentPoll.question;
+                const voteOptions = document.getElementById('voteOptions');
+                voteOptions.innerHTML = '';
+                
+                currentPoll.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'poll-option';
+                    
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'pollOption';
+                    radio.value = index;
+                    radio.id = `option-${index}`;
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `option-${index}`;
+                    label.textContent = option.text;
+                    
+                    optionDiv.appendChild(radio);
+                    optionDiv.appendChild(label);
+                    voteOptions.appendChild(optionDiv);
+                });
+                
+                document.getElementById('pollForm').style.display = 'none';
+                activePoll.style.display = 'block';
+                pollResults.style.display = 'none';
+            }
+            
+            // Vote form
+            document.getElementById('voteForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const selectedOption = document.querySelector('input[name="pollOption"]:checked');
+                
+                if (!selectedOption) {
+                    alert('Please select an option!');
+                    return;
+                }
+                
+                const optionIndex = parseInt(selectedOption.value);
+                currentPoll.options[optionIndex].votes++;
+                currentPoll.voted = true;
+                
+                playSound(winSound);
+                createConfetti(selectedOption.closest('.poll-option'), 15);
+                setTimeout(displayResults, 500);
+            });
+            
+            // View results
+            document.getElementById('viewResults').addEventListener('click', function() {
+                displayResults();
+                playSound(clickSound);
+            });
+            
+            // Back to create
+            document.getElementById('backToCreate').addEventListener('click', function() {
+                document.getElementById('pollForm').style.display = 'block';
+                activePoll.style.display = 'none';
+                pollResults.style.display = 'none';
+                document.getElementById('createPollForm').reset();
+                pollOptions.innerHTML = `
+                    <input type="text" class="poll-option-input" placeholder="Option 1" required>
+                    <input type="text" class="poll-option-input" placeholder="Option 2" required>
+                `;
+                playSound(clickSound);
+            });
+            
+            // Display results
+            function displayResults() {
+                document.getElementById('resultsQuestion').textContent = currentPoll.question;
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = '';
+                
+                const totalVotes = currentPoll.options.reduce((sum, option) => sum + option.votes, 0);
+                const maxVotes = Math.max(...currentPoll.options.map(option => option.votes));
+                
+                currentPoll.options.forEach((option, index) => {
+                    const percentage = totalVotes > 0 ? Math.round((option.votes / totalVotes) * 100) : 0;
+                    const isWinner = option.votes === maxVotes && maxVotes > 0;
+                    
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'result-item';
+                    
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'result-label';
+                    labelDiv.innerHTML = `
+                        <span>${option.text}</span>
+                        <span>${percentage}% (${option.votes} vote${option.votes !== 1 ? 's' : ''})</span>
+                        ${isWinner ? '<span class="winner-badge">WINNER</span>' : ''}
+                    `;
+                    
+                    const barDiv = document.createElement('div');
+                    barDiv.className = 'result-bar';
+                    
+                    const barFill = document.createElement('div');
+                    barFill.className = 'bar-fill';
+                    barFill.style.width = '0%';
+                    
+                    setTimeout(() => {
+                        barFill.style.width = `${percentage}%`;
+                    }, index * 200);
+                    
+                    barDiv.appendChild(barFill);
+                    resultDiv.appendChild(labelDiv);
+                    resultDiv.appendChild(barDiv);
+                    resultsContainer.appendChild(resultDiv);
+                });
+                
+                activePoll.style.display = 'none';
+                pollResults.style.display = 'block';
+                
+                if (currentPoll.voted) {
+                    setTimeout(() => {
+                        createConfetti(resultsContainer, 30);
+                        playSound(confettiSound);
+                    }, 500);
+                }
+            }
+            
+            // Create confetti effect
+            function createConfetti(element, count) {
+                const rect = element.getBoundingClientRect();
+                const colors = ['#7b2cbf', '#c77dff', '#ff9e00', '#38b000', '#ff6b6b'];
+                
+                for (let i = 0; i < count; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${rect.left + Math.random() * rect.width}px`;
+                    confetti.style.top = `${rect.top + Math.random() * rect.height}px`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = `${Math.random() * 8 + 4}px`;
+                    confetti.style.height = `${Math.random() * 8 + 4}px`;
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Animate
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = 5 + Math.random() * 5;
+                    const x = velocity * Math.cos(angle);
+                    const y = velocity * Math.sin(angle);
+                    
+                    let posX = rect.left + rect.width / 2;
+                    let posY = rect.top + rect.height / 2;
+                    let opacity = 1;
+                    
+                    const animate = () => {
+                        posX += x;
+                        posY += y - 0.2;
+                        opacity -= 0.02;
+                        
+                        confetti.style.left = `${posX}px`;
+                        confetti.style.top = `${posY}px`;
+                        confetti.style.opacity = opacity;
+                        
+                        if (opacity > 0) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            confetti.remove();
+                        }
+                    };
+                    
+                    setTimeout(() => {
+                        requestAnimationFrame(animate);
+                    }, i * 50);
+                }
+            }
+        });
+    </script>
+</body>
 </html>

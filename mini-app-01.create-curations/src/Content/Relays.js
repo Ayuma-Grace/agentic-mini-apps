@@ -1,8 +1,19 @@
-const relaysOnPlatform = [
-  "wss://nostr-01.yakihonne.com",
-  "wss://nostr-02.yakihonne.com",
-  "wss://relay.damus.io",
-  "wss://relay.nostr.band",
-];
+import { ndkInstance } from '../Helpers/NDKInstance';
 
-export default relaysOnPlatform;
+export const addRelay = async (relayUrl) => {
+  try {
+    await ndkInstance.pool.addRelay(relayUrl);
+    return true;
+  } catch (error) {
+    console.error('Error adding relay:', error);
+    return false;
+  }
+};
+
+export const removeRelay = (relayUrl) => {
+  ndkInstance.pool.removeRelay(relayUrl);
+};
+
+export const getActiveRelays = () => {
+  return Array.from(ndkInstance.pool.relays.values()).map(r => r.url);
+};

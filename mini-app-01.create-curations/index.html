@@ -1,13 +1,796 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create curations</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Content Curation Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --gray: #6c757d;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: white;
+            transform: skewY(-3deg);
+            z-index: 1;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-with-button input {
+            flex: 1;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e5177b;
+        }
+        
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+        
+        .items-container {
+            margin-top: 1.5rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            border: 2px dashed #e9ecef;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #adb5bd;
+        }
+        
+        .item-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease-out;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .item-card:hover {
+            background: #e9ecef;
+        }
+        
+        .item-content {
+            flex: 1;
+            padding-right: 1rem;
+        }
+        
+        .item-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            word-break: break-word;
+        }
+        
+        .item-type {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--accent);
+            color: white;
+            margin-right: 8px;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .preview-container {
+            margin-top: 2rem;
+            border-top: 1px solid #e9ecef;
+            padding-top: 2rem;
+        }
+        
+        .preview-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .preview-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .preview-description {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .preview-item {
+            padding: 1rem;
+            border-left: 3px solid var(--accent);
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .progress-container {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            width: 0;
+            transition: width 0.5s ease;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .toast-success {
+            background: var(--success);
+        }
+        
+        .toast-error {
+            background: var(--danger);
+        }
+        
+        .type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .type-option {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .type-radio {
+            display: none;
+        }
+        
+        .type-label {
+            display: block;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .type-radio:checked + .type-label {
+            background: var(--primary);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                border-radius: 12px;
+            }
+            
+            header {
+                padding: 1.5rem 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .input-with-button {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-star"></i> Content Curation Master</h1>
+            <p class="subtitle">Create stunning content collections with ease</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-pencil-alt"></i> Basic Information</h2>
+                <div class="form-group">
+                    <label for="curation-title">Curation Title *</label>
+                    <input type="text" id="curation-title" placeholder="Awesome Resources for Web Developers" required>
+                </div>
+                <div class="form-group">
+                    <label for="curation-description">Description</label>
+                    <textarea id="curation-description" placeholder="Describe what this collection is about..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="curation-tags">Tags (comma separated)</label>
+                    <input type="text" id="curation-tags" placeholder="webdev, javascript, css">
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-plus-circle"></i> Add Content Items</h2>
+                
+                <div class="type-selector">
+                    <div class="type-option">
+                        <input type="radio" id="type-url" name="item-type" class="type-radio" value="url" checked>
+                        <label for="type-url" class="type-label"><i class="fas fa-link"></i> URL</label>
+                    </div>
+                    <div class="type-option">
+                        <input type="radio" id="type-text" name="item-type" class="type-radio" value="text">
+                        <label for="type-text" class="type-label"><i class="fas fa-align-left"></i> Text</label>
+                    </div>
+                    <div class="type-option">
+                        <input type="radio" id="type-image" name="item-type" class="type-radio" value="image">
+                        <label for="type-image" class="type-label"><i class="fas fa-image"></i> Image</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-item">Item Content *</label>
+                    <div class="input-with-button">
+                        <input type="text" id="new-item" placeholder="Enter URL, text, or image URL...">
+                        <button id="add-item-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                
+                <div class="items-container">
+                    <h3>Your Items <small>(<span id="item-count">0</span> added)</small></h3>
+                    
+                    <div id="empty-state" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No items added yet. Start building your collection!</p>
+                    </div>
+                    
+                    <div id="items-list"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-eye"></i> Preview</h2>
+                <div class="preview-container">
+                    <p>See how your curation will look to others:</p>
+                    
+                    <div class="preview-card">
+                        <h3 class="preview-title" id="preview-title">Your Curation Title</h3>
+                        <p class="preview-description" id="preview-description">Description will appear here</p>
+                        
+                        <div id="preview-items">
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-list"></i>
+                                <p>Your items will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-container" id="progress-container">
+                <p>Saving your amazing curation...</p>
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                <button id="reset-btn" class="btn btn-outline"><i class="fas fa-trash-alt"></i> Reset</button>
+                <button id="save-curation" class="btn btn-primary"><i class="fas fa-save"></i> Save Curation</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Curation saved successfully!</span>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const addItemBtn = document.getElementById('add-item-btn');
+            const newItemInput = document.getElementById('new-item');
+            const itemsList = document.getElementById('items-list');
+            const emptyState = document.getElementById('empty-state');
+            const itemCount = document.getElementById('item-count');
+            const saveBtn = document.getElementById('save-curation');
+            const resetBtn = document.getElementById('reset-btn');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const typeRadios = document.querySelectorAll('.type-radio');
+            
+            // Preview elements
+            const previewTitle = document.getElementById('preview-title');
+            const previewDescription = document.getElementById('preview-description');
+            const previewItems = document.getElementById('preview-items');
+            
+            // State
+            let items = [];
+            let currentItemType = 'url';
+            
+            // Event Listeners
+            addItemBtn.addEventListener('click', addItem);
+            newItemInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addItem();
+            });
+            
+            saveBtn.addEventListener('click', saveCuration);
+            resetBtn.addEventListener('click', resetForm);
+            
+            typeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    currentItemType = this.value;
+                    updateInputPlaceholder();
+                });
+            });
+            
+            // Functions
+            function updateInputPlaceholder() {
+                const placeholderMap = {
+                    'url': 'Enter URL (e.g., https://example.com)',
+                    'text': 'Enter text content',
+                    'image': 'Enter image URL (e.g., https://example.com/image.jpg)'
+                };
+                newItemInput.placeholder = placeholderMap[currentItemType];
+            }
+            
+            function addItem() {
+                const value = newItemInput.value.trim();
+                if (!value) {
+                    showToast('Please enter some content', 'error');
+                    return;
+                }
+                
+                // Validate URLs if type is url or image
+                if ((currentItemType === 'url' || currentItemType === 'image') && !isValidUrl(value)) {
+                    showToast('Please enter a valid URL', 'error');
+                    return;
+                }
+                
+                const item = {
+                    id: Date.now(),
+                    type: currentItemType,
+                    content: value,
+                    notes: ''
+                };
+                
+                items.push(item);
+                renderItems();
+                updatePreview();
+                newItemInput.value = '';
+                
+                // Show success feedback
+                showToast('Item added successfully', 'success');
+            }
+            
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            function removeItem(id) {
+                items = items.filter(item => item.id !== id);
+                renderItems();
+                updatePreview();
+                showToast('Item removed', 'success');
+            }
+            
+            function renderItems() {
+                if (items.length === 0) {
+                    emptyState.style.display = 'block';
+                    itemsList.innerHTML = '';
+                    itemCount.textContent = '0';
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                itemCount.textContent = items.length;
+                
+                itemsList.innerHTML = items.map(item => `
+                    <div class="item-card" data-id="${item.id}">
+                        <div class="item-content">
+                            <div class="item-title">${truncate(item.content, 60)}</div>
+                            <div>
+                                <span class="item-type">${item.type}</span>
+                                <small>${formatDate(item.id)}</small>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-outline btn-sm edit-btn" data-id="${item.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm remove-btn" data-id="${item.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        removeItem(id);
+                    });
+                });
+                
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        editItem(id);
+                    });
+                });
+            }
+            
+            function truncate(str, n) {
+                return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+            }
+            
+            function formatDate(timestamp) {
+                return new Date(timestamp).toLocaleString();
+            }
+            
+            function editItem(id) {
+                const item = items.find(item => item.id === id);
+                if (!item) return;
+                
+                // In a real app, you might open a modal or edit inline
+                showToast(`Editing item: ${truncate(item.content, 30)}`, 'success');
+            }
+            
+            function updatePreview() {
+                const title = document.getElementById('curation-title').value || 'Your Curation Title';
+                const description = document.getElementById('curation-description').value || 'Description will appear here';
+                
+                previewTitle.textContent = title;
+                previewDescription.textContent = description;
+                
+                if (items.length === 0) {
+                    previewItems.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <p>Your items will appear here</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                previewItems.innerHTML = items.map(item => `
+                    <div class="preview-item">
+                        ${getPreviewContent(item)}
+                    </div>
+                `).join('');
+            }
+            
+            function getPreviewContent(item) {
+                switch(item.type) {
+                    case 'url':
+                        return `<a href="${item.content}" target="_blank">${item.content}</a>`;
+                    case 'image':
+                        return `<img src="${item.content}" alt="Curation image" style="max-width: 100%; border-radius: 8px;">`;
+                    case 'text':
+                        return `<p>${item.content}</p>`;
+                    default:
+                        return item.content;
+                }
+            }
+            
+            function saveCuration() {
+                const title = document.getElementById('curation-title').value.trim();
+                if (!title) {
+                    showToast('Please enter a title for your curation', 'error');
+                    return;
+                }
+                
+                if (items.length === 0) {
+                    showToast('Please add at least one item to your curation', 'error');
+                    return;
+                }
+                
+                const description = document.getElementById('curation-description').value.trim();
+                const tags = document.getElementById('curation-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                
+                const curation = {
+                    title,
+                    description,
+                    tags,
+                    items,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Show progress
+                progressContainer.style.display = 'block';
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // Simulate API call completion
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                            progressBar.style.width = '0';
+                            showToast('Curation saved successfully!', 'success');
+                            console.log('Curation saved:', curation);
+                            
+                            // In a real app, you would redirect or reset the form
+                            // resetForm();
+                        }, 500);
+                    }
+                    progressBar.style.width = `${progress}%`;
+                }, 200);
+            }
+            
+            function resetForm() {
+                if (items.length === 0 && !document.getElementById('curation-title').value) {
+                    showToast('Nothing to reset', 'error');
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to reset? All your progress will be lost.')) {
+                    document.getElementById('curation-title').value = '';
+                    document.getElementById('curation-description').value = '';
+                    document.getElementById('curation-tags').value = '';
+                    items = [];
+                    renderItems();
+                    updatePreview();
+                    showToast('Form reset', 'success');
+                }
+            }
+            
+            function showToast(message, type = 'success') {
+                toast.className = `toast toast-${type}`;
+                toastMessage.textContent = message;
+                
+                // Update icon based on type
+                const icon = toast.querySelector('i');
+                icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Initialize
+            updateInputPlaceholder();
+        });
+    </script>
+</body>
 </html>

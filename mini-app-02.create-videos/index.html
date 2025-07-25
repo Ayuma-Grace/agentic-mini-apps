@@ -1,13 +1,505 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create videos</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Creator | YakiHonne Mini-App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --yh-primary: #6e48aa;
+            --yh-secondary: #9d50bb;
+            --vibe-purple: #8a2be2;
+            --vibe-pink: #ff1493;
+            --vibe-blue: #00bfff;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+        }
+        .yh-header {
+            background: linear-gradient(135deg, var(--yh-primary), var(--yh-secondary));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .yh-header::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://assets.codepen.io/3364143/7bGDR+hvPZk.png') center/cover;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .yh-btn-primary {
+            background: var(--yh-primary);
+            border: none;
+            transition: all 0.3s;
+        }
+        .yh-btn-primary:hover {
+            background: var(--yh-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(110, 72, 170, 0.4);
+        }
+        .video-container {
+            background: black;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .feature-card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .upload-zone {
+            border: 3px dashed var(--vibe-blue);
+            border-radius: 12px;
+            background: rgba(0, 191, 255, 0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .upload-zone:hover {
+            transform: translateY(-3px);
+            border-color: var(--yh-primary);
+            background: rgba(110, 72, 170, 0.05);
+        }
+        .upload-zone.active {
+            border-color: var(--yh-secondary);
+            background: rgba(157, 80, 187, 0.1);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(110, 72, 170, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(110, 72, 170, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(110, 72, 170, 0); }
+        }
+        .video-preview {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .video-preview:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .progress-bar-gradient {
+            background: linear-gradient(90deg, var(--yh-primary), var(--yh-secondary));
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="yh-header py-5 mb-5">
+        <div class="container text-center position-relative" style="z-index: 1;">
+            <h1 class="display-4 fw-bold mb-3">🎥 Video Creator</h1>
+            <p class="lead fs-4">Create, upload and share your videos</p>
+            <div class="floating mt-4">
+                <i class="bi bi-camera-reels" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-sm mb-5">
+                    <div class="card-body p-4">
+                        <ul class="nav nav-tabs mb-4" id="videoTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="record-tab" data-bs-toggle="tab" data-bs-target="#record" type="button" role="tab">
+                                    <i class="bi bi-record-circle me-2"></i>Record
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab">
+                                    <i class="bi bi-upload me-2"></i>Upload
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="videoTabsContent">
+                            <!-- Record Tab -->
+                            <div class="tab-pane fade show active" id="record" role="tabpanel">
+                                <div class="video-container mb-4 ratio ratio-16x9">
+                                    <video id="videoPreview" class="w-100" autoplay muted></video>
+                                </div>
+                                
+                                <div class="d-flex justify-content-center gap-3 mb-4">
+                                    <button id="startRecording" class="btn yh-btn-primary text-white">
+                                        <i class="bi bi-record-circle"></i> Start Recording
+                                    </button>
+                                    <button id="stopRecording" class="btn btn-danger" disabled>
+                                        <i class="bi bi-stop-circle"></i> Stop
+                                    </button>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="videoTitle" class="form-label">Video Title</label>
+                                    <input type="text" class="form-control" id="videoTitle" placeholder="My Awesome Video">
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button id="saveRecording" class="btn btn-success" disabled>
+                                        <i class="bi bi-save"></i> Save Recording
+                                    </button>
+                                    <button id="generateWithAI" class="btn btn-outline-primary">
+                                        <i class="bi bi-magic"></i> Enhance with AI
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Tab -->
+                            <div class="tab-pane fade" id="upload" role="tabpanel">
+                                <div id="uploadZone" class="upload-zone p-4 p-lg-5 text-center mb-4">
+                                    <div id="uploadContent">
+                                        <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: var(--yh-primary);"></i>
+                                        <h4 class="mt-3 fw-bold">DROP YOUR VIDEO HERE</h4>
+                                        <p class="text-muted">or click to browse files</p>
+                                        <small class="text-muted">MP4, MOV, AVI up to 500MB</small>
+                                    </div>
+                                    <input type="file" id="videoInput" accept="video/*" class="d-none">
+                                </div>
+                                
+                                <div id="uploadPreviewContainer" class="text-center mb-4" style="display: none;">
+                                    <video id="uploadPreview" controls class="video-preview w-100"></video>
+                                    <button id="clearVideo" class="btn btn-sm btn-outline-danger mt-2">
+                                        <i class="bi bi-trash"></i> Clear
+                                    </button>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="uploadTitle" placeholder="Video Title">
+                                        <label for="uploadTitle"><i class="bi bi-card-heading me-2"></i>Video Title</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="uploadDescription" placeholder="Description" style="height: 100px"></textarea>
+                                        <label for="uploadDescription"><i class="bi bi-chat-square-text me-2"></i>Description</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button id="uploadBtn" class="btn yh-btn-primary text-white py-3" disabled>
+                                        <span id="uploadText"><i class="bi bi-cloud-upload me-2"></i>UPLOAD VIDEO</span>
+                                        <span id="uploadSpinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                                    </button>
+                                </div>
+                                
+                                <div class="progress mt-3" style="height: 8px; display: none;">
+                                    <div id="uploadProgress" class="progress-bar progress-bar-gradient" 
+                                         role="progressbar" style="width: 0%"></div>
+                                </div>
+                                
+                                <div id="uploadStatus" class="mt-3 text-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features Section -->
+                <section class="row g-4 mb-5">
+                    <h3 class="text-center mb-4">✨ Key Features</h3>
+                    
+                    <div class="col-md-4">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center py-4">
+                                <i class="bi bi-camera-video fs-1 text-primary mb-3"></i>
+                                <h5 class="card-title">Screen Recording</h5>
+                                <p class="card-text">Record your screen, camera, or both with our simple interface.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center py-4">
+                                <i class="bi bi-robot fs-1 text-primary mb-3"></i>
+                                <h5 class="card-title">AI Enhancements</h5>
+                                <p class="card-text">Automatically add captions, transitions, and effects using AI.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center py-4">
+                                <i class="bi bi-share fs-1 text-primary mb-3"></i>
+                                <h5 class="card-title">Easy Sharing</h5>
+                                <p class="card-text">Export videos in multiple formats or share directly to platforms.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-muted bg-light">
+        <p>Made with <i class="bi bi-heart-fill text-danger"></i> for the Nostr Community</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab switching
+            const videoTabs = new bootstrap.Tab(document.getElementById('record-tab'));
+            
+            // Recording functionality
+            const videoPreview = document.getElementById('videoPreview');
+            const startBtn = document.getElementById('startRecording');
+            const stopBtn = document.getElementById('stopRecording');
+            const saveBtn = document.getElementById('saveRecording');
+            let mediaRecorder;
+            let recordedChunks = [];
+            
+            startBtn.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true, 
+                        audio: true 
+                    });
+                    videoPreview.srcObject = stream;
+                    
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = (e) => {
+                        if (e.data.size > 0) {
+                            recordedChunks.push(e.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                        // Enable save button
+                        saveBtn.disabled = false;
+                        console.log('Video recorded:', videoBlob);
+                    };
+                    
+                    mediaRecorder.start();
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                } catch (err) {
+                    console.error('Error accessing media devices:', err);
+                    alert('Could not access camera/microphone');
+                }
+            });
+            
+            stopBtn.addEventListener('click', () => {
+                mediaRecorder.stop();
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            });
+            
+            saveBtn.addEventListener('click', () => {
+                // Switch to upload tab with the recorded video
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const file = new File([blob], 'recording.webm', { type: 'video/webm' });
+                
+                // Simulate file selection
+                handleFileUpload(file);
+                bootstrap.Tab.getInstance(document.getElementById('upload-tab')).show();
+            });
+            
+            // Upload functionality
+            const uploadZone = document.getElementById('uploadZone');
+            const uploadContent = document.getElementById('uploadContent');
+            const videoInput = document.getElementById('videoInput');
+            const uploadPreview = document.getElementById('uploadPreview');
+            const uploadPreviewContainer = document.getElementById('uploadPreviewContainer');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadText = document.getElementById('uploadText');
+            const uploadSpinner = document.getElementById('uploadSpinner');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressBar = document.querySelector('.progress');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const clearVideo = document.getElementById('clearVideo');
+            
+            // Handle drag and drop
+            ['dragenter', 'dragover'].forEach(event => {
+                uploadZone.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    uploadZone.classList.add('active', 'pulse');
+                });
+            });
+            
+            ['dragleave', 'drop'].forEach(event => {
+                uploadZone.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    uploadZone.classList.remove('active', 'pulse');
+                });
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files.length && files[0].type.startsWith('video/')) {
+                    handleFileUpload(files[0]);
+                }
+            });
+            
+            // Handle file selection
+            uploadZone.addEventListener('click', () => videoInput.click());
+            videoInput.addEventListener('change', () => {
+                if (videoInput.files.length) {
+                    handleFileUpload(videoInput.files[0]);
+                }
+            });
+            
+            // Handle file
+            function handleFileUpload(file) {
+                if (!file.type.startsWith('video/')) {
+                    showStatus('Please select a video file', 'danger');
+                    return;
+                }
+                
+                // Update UI
+                uploadContent.innerHTML = `
+                    <i class="bi bi-file-earmark-play" style="font-size: 2.5rem; color: var(--yh-secondary);"></i>
+                    <h4 class="mt-3 fw-bold">${file.name}</h4>
+                    <p class="text-muted">${(file.size / (1024 * 1024).toFixed(2)} MB</p>
+                    <small class="text-muted">Click to change</small>
+                `;
+                
+                // Show preview
+                uploadPreview.src = URL.createObjectURL(file);
+                uploadPreviewContainer.style.display = 'block';
+                uploadBtn.disabled = false;
+                
+                // Set title from recording if available
+                const recordedTitle = document.getElementById('videoTitle').value;
+                if (recordedTitle) {
+                    document.getElementById('uploadTitle').value = recordedTitle;
+                }
+            }
+            
+            // Clear video
+            clearVideo.addEventListener('click', () => {
+                uploadPreview.src = '';
+                uploadPreviewContainer.style.display = 'none';
+                uploadContent.innerHTML = `
+                    <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: var(--yh-primary);"></i>
+                    <h4 class="mt-3 fw-bold">DROP YOUR VIDEO HERE</h4>
+                    <p class="text-muted">or click to browse files</p>
+                    <small class="text-muted">MP4, MOV, AVI up to 500MB</small>
+                `;
+                uploadBtn.disabled = true;
+                videoInput.value = '';
+            });
+            
+            // Upload function
+            uploadBtn.addEventListener('click', () => {
+                const file = videoInput.files[0] || new Blob(recordedChunks, { type: 'video/webm' });
+                const title = document.getElementById('uploadTitle').value || 'Untitled Video';
+                const description = document.getElementById('uploadDescription').value || '';
+                
+                if (file) {
+                    startUpload(file, title, description);
+                }
+            });
+            
+            function startUpload(file, title, description) {
+                // UI changes
+                uploadBtn.disabled = true;
+                uploadText.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>UPLOADING...';
+                uploadSpinner.style.display = 'inline-block';
+                progressBar.style.display = 'block';
+                uploadStatus.innerHTML = '';
+                
+                // Create FormData
+                const formData = new FormData();
+                formData.append('video', file);
+                formData.append('title', title);
+                formData.append('description', description);
+                
+                // XMLHttpRequest for upload progress
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        uploadProgress.style.width = percentComplete + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        uploadComplete();
+                    } else {
+                        showStatus('Upload failed: ' + xhr.statusText, 'danger');
+                        uploadBtn.disabled = false;
+                        uploadText.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>TRY AGAIN';
+                        uploadSpinner.style.display = 'none';
+                    }
+                });
+                
+                xhr.addEventListener('error', () => {
+                    showStatus('Upload failed', 'danger');
+                    uploadBtn.disabled = false;
+                    uploadText.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>TRY AGAIN';
+                    uploadSpinner.style.display = 'none';
+                });
+                
+                // Replace with your actual upload endpoint
+                xhr.open('POST', 'https://your-upload-endpoint.com/upload', true);
+                xhr.send(formData);
+            }
+            
+            function uploadComplete() {
+                uploadText.innerHTML = '<i class="bi bi-check-circle me-2"></i>UPLOADED!';
+                uploadSpinner.style.display = 'none';
+                
+                uploadStatus.innerHTML = `
+                    <div class="alert alert-success mt-3">
+                        <i class="bi bi-check-circle-fill"></i> 
+                        Your video has been uploaded successfully!
+                    </div>
+                `;
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    uploadText.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>UPLOAD VIDEO';
+                    progressBar.style.display = 'none';
+                    uploadProgress.style.width = '0%';
+                }, 3000);
+            }
+            
+            // AI generation mock
+            document.getElementById('generateWithAI').addEventListener('click', () => {
+                showStatus('AI enhancement feature would be implemented here', 'info');
+            });
+            
+            function showStatus(message, type) {
+                uploadStatus.innerHTML = `
+                    <div class="alert alert-${type} mt-3">
+                        ${message}
+                    </div>
+                `;
+                setTimeout(() => {
+                    uploadStatus.innerHTML = '';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
 </html>

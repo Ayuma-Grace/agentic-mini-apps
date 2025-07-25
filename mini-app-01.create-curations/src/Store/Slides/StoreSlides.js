@@ -1,29 +1,30 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
-const toastSlice = createSlice({
-  name: "toast",
-  initialState: null,
+const initialState = {
+  curations: [],
+  relays: [],
+  isLoading: false,
+  error: null
+};
+
+const curationSlice = createSlice({
+  name: 'curation',
+  initialState,
   reducers: {
-    setToast(state, action) {
-      return action.payload;
+    addCuration: (state, action) => {
+      state.curations.push(action.payload);
     },
-  },
+    setRelays: (state, action) => {
+      state.relays = action.payload;
+    },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    }
+  }
 });
 
-const nostrAuthorsSlice = createSlice({
-  name: "nostrAuthors",
-  initialState: [],
-  reducers: {
-    setNostrAuthors(state, action) {
-      return action.payload;
-    },
-  },
-});
-
-
-export const { setToast } = toastSlice.actions;
-export const { setNostrAuthors } = nostrAuthorsSlice.actions;
-
-export const NostrAuthorsReducer = nostrAuthorsSlice.reducer;
-export const ToastReducer = toastSlice.reducer;
-
+export const { addCuration, setRelays, setLoading, setError } = curationSlice.actions;
+export default curationSlice.reducer;
