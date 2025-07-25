@@ -1,12 +1,56 @@
-# React + Vite
+### 📊 3. Mini App: **Zap Poll**
+**Folder:** `mini-app-03.zap-poll`
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight, interactive polling tool for collecting audience feedback in real time. Designed for speed, simplicity, and engagement.
 
-Currently, two official plugins are available:
+**Key Features:**
+- Create single-question polls
+- Users can vote instantly
+- Display total votes or percentages
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Use Case:** Quick feedback during events, lessons, or product demos.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 How to Run
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/Ayuma-Grace/agentic-mini-apps.git
+   cd agentic-mini-apps
+Choose a mini-app folder, e.g.:
+
+bash
+Copy
+Edit
+cd mini-app-03.zap-poll
+Open index.html in your browser, or use Live Server in VS Code.
+
+📄 License
+MIT License — use freely with attribution.
+
+yaml
+Copy
+Edit
+
+---
+
+### ✅ Summary of Differences:
+| Mini App              | Purpose                      | Interaction Style       | Visual Output       |
+|-----------------------|------------------------------|-------------------------|----------------------|
+| Create Curations      | Organize content or links     | Add/remove list items   | Text-based list UI   |
+| Create Videos         | Embed and manage video clips  | Display media + metadata| Video UI             |
+| Zap Poll              | Real-time polling             | Voting & live count     | Bar or count display |
+
+---
+
+Would you like a separate `README.md` inside each mini-app folder, or just this one at the root level?
+
+
+
+
+
+
+
+
+Ask ChatGPT
